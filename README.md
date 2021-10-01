@@ -1,4 +1,7 @@
 # Sistemas de Recomendação para Animes
+Sistemas de recomendações são algoritmos criados para resolver problemas de sobrecarga de informação, auxiliando na busca por produtos e sugerindo lista de itens que podem ser relevantes através das informações sobre o usuário e dos itens. Existem várias de técnicas de recomendações, dentre elas destacam-se: filtragem baseada no conteúdo e filtragem colaborativa.   
+
+
 
 ## Por Popularidade
 Funciona basicamente sugerindo produtos que estão em alta. Essa abordagem é caracterizada pela tendência. Assim como no sistema anterior, ele generaliza as recomendações para todos os usuários, independentemente das suas características ou preferências.  A vantagem dessa filtragem é que não tem problema de recomendação para usuários novos, porém não consegue sugerir itens novos. 
