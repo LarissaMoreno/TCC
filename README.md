@@ -1,4 +1,10 @@
-# Sistemas de Recomendação para Animes
+# Introdução
+Identificar o que é e o que não é relevante é o principal objetivo dos sistemas de recomendação e existem critérios para determinar isso. Veremos adiante que alguns algoritmos utilizam informações baseadas nos usuários ou na concordância e similaridade entre eles e outros dados sobre o conteúdo/características de seus itens. A utilização de algumas técnicas estatísticas é essencial para ajudar a classificar e estimar produtos que usuários possam se interessar. 
+
+Neste trabalho, focaremos nos serviços de streaming de animes. A quantidade de animes produzidos é em torno de 150 a 200 por ano. Diante disso, procurar algo que seja de interesse de algum usuário em meio a grandes possibilidades de opções é uma tarefa difícil. Sendo assim, interessante criar algoritmos que recomendam programas que sejam mais interessantes ou que sejam mais preferíveis para cada usuário. Esse trabalho visa otimizar esse problema do tempo de procura por esses programas. 
+
+
+# Sistemas de Recomendação
 Sistemas de recomendações são algoritmos criados para resolver problemas de sobrecarga de informação, auxiliando na busca por produtos e sugerindo lista de itens que podem ser relevantes através das informações sobre o usuário e dos itens. Existem várias de técnicas de recomendações, dentre elas destacam-se: filtragem baseada no conteúdo e filtragem colaborativa.   
 
 
