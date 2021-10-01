@@ -11,7 +11,7 @@ library(data.table)
 
 
 anime=read.csv("animes2.csv")
-rating <-read.csv("rating.csv")
+rating <-readRDS("rating1.rds")
 
 #data clean
 rating=rating%>%filter(rating!=-1)#remover o grupo de pessoas que assistiram mas nao avaliaram
