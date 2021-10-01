@@ -112,7 +112,7 @@ t=anime %>%drop_na()%>% group_by(type) %>% summarise(Count=n())
 barplot(height=t$Count, names=t$type,main="Tipos de Anime",ylab = "Frequência",xlab= "Tipo de Programa")
 
 
-#Generos existentes 
+#Generos existentes dase de dados anime
 genre=data.frame(genre=anime$genre)
 
 type=cSplit_e(as.data.table(genre), "genre", ",", type = "character", fill = 0)
@@ -138,6 +138,8 @@ anime_genre <- select(anime_genre, c(1, 2, 4))
 
 
 type=cSplit_e(as.data.table(anime_genre), "genre", ",", type = "character", fill = 0)
+#total de generos na base rating
+t=data.frame(colSums(type[,-c(1:3)]))
 
 #proporção de usuarios
 type2=type
