@@ -7,11 +7,11 @@ Funciona basicamente sugerindo produtos que estão em alta. Essa abordagem é ca
 Essa abordagem se baseia principalmente na similaridade dos itens, ou seja, um usuário gostará de itens semelhantes ao que ele goste. Essa técnica necessita de dados fornecidos pelos usuários, como as avaliações de produtos, lembrando que o usuário não precisa necessariamente avaliar todos os produtos do catálogo, no entanto, quanto mais informação a pessoa fornecer, mais precisa serão as recomendações.
 
 ## Colaborativa Baseada em Usuário
-Nesse procedimeno, utiliza-se uma matriz $UxI$, onde as linhas representam os usuários e as colunas os itens, e as entradas $a_{ij}$ é nota que o usuário i fez ao item j, conforme a Figura 1. A partir dessa matriz, compara-se o usuário-alvo à k outros usuários usando medidas de similaridade. Depois de detecta o grupo de usuários mais similares, avalia-se os itens comprados por esse grupo a partir da média, frequência ou por pesos das avaliações. Em seguida recomenda-se o top-N itens mais bem avaliados.  
+Nesse procedimeno, utiliza-se uma matriz UxI, onde as linhas representam os usuários e as colunas os itens, e as entradas Aij é nota que o usuário i fez ao item j. A partir dessa matriz, compara-se o usuário-alvo à k outros usuários usando medidas de similaridade. Depois de detecta o grupo de usuários mais similares, avalia-se os itens comprados por esse grupo a partir da média, frequência ou por pesos das avaliações. Em seguida recomenda-se o top-N itens mais bem avaliados.  
 
 ## Colaborativa Baseada em Item
 
-Para cada dois itens medido o quão semelhantes eles são em termos de terem recebido classificações semelhantes por usuários semelhantes (vide Figura 2) depois, para cada item, indetifica-se os k-itens mais semelhantes. Para cada usuário, identifica-se os itens que são mais semelhantes às compras do usuário e recomenda-se aqueles com uma avaliação mais alta.
+Para cada dois itens medido o quão semelhantes eles são em termos de terem recebido classificações semelhantes por usuários semelhantes depois, para cada item, indetifica-se os k-itens mais semelhantes. Para cada usuário, identifica-se os itens que são mais semelhantes às compras do usuário e recomenda-se aqueles com uma avaliação mais alta.
 
 
 # Metodologia
