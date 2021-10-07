@@ -151,3 +151,5 @@ c$prop=c/c[44,1]
 c=colSums(type2)
 
 
+
+
