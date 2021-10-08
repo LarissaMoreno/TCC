@@ -55,8 +55,6 @@ summary(media.user.rating$n)
 hist(media.user.rating$n,xlim = c(0,900),
      breaks = seq(min(media.user.rating$n), max(media.user.rating$n), length.out = 150),
      main="Distribuição de avaliações por usuário",xlab="Número de avaliações")
-
-
 #a maioria dos usuarios avaliaram menos de 200 animes
 
 
@@ -69,7 +67,7 @@ summary(media.anime.rating$n)
 hist(media.anime.rating$n,xlim = c(0,1100),
      breaks = seq(min(media.anime.rating$n), max(media.anime.rating$n), length.out = 600),
      main="Distribuição de avaliações por anime",xlab="Número de animes")
-
+#a maioria dos animes receberao pelo menos 57 avaliações
 
 
 #Distribuição Valores das avaliações
