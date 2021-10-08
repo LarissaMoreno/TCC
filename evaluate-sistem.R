@@ -61,7 +61,7 @@ x
 #RMSE MSE MAE
 IBCF_accuracy <- calcPredictionAccuracy(
   x = IBCF_prediction, data = getData(eval_sets, "unknown"), byUser =
-    TRUE)
+    F)
 head(IBCF_accuracy)
 
 
@@ -84,7 +84,7 @@ x1
 #RMSE MSE MAE
 UBCF_accuracy <- calcPredictionAccuracy(
   x = UBCF_prediction, data = getData(eval_sets, "unknown"), byUser =
-    TRUE)
+    F)
 head(UBCF_accuracy)
 
 
@@ -108,7 +108,7 @@ x2
 #RMSE MSE MAE
 POP_accuracy <- calcPredictionAccuracy(
   x = POP_prediction, data = getData(eval_sets, "unknown"), byUser =
-    TRUE)
+    F)
 head(POP_accuracy)
 
 
@@ -124,7 +124,7 @@ models_evaluate <- list(
   IBCF = list(name = "IBCF"),
   UBCF=list(name="UBCF"),
   POPULAR = list(name = "POPULAR"))
-results <- evaluate(x = eval_sets, method =  models_evaluate, n =c(1, 3, 5, 15, 20))
+results <- evaluate(x = eval_sets, method =  models_evaluate, n =seq(10, 100, 10))
 
 
 results[["IBCF"]]@results[[1]]@cm
