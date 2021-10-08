@@ -4,6 +4,7 @@ library(recommenderlab)
 #setwd("~/Larissa/TCC")
 #save.image("evaluate-sistem.RData")
 #load("C:/Users/gabri/Documents/Larissa/TCC/evaluate-sistem.RData")
+anime=read.csv("animes2.csv")
 rating <-read.csv("rating.csv")
 
 #data clean
