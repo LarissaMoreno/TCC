@@ -6,6 +6,11 @@ library(recommenderlab)
 #load("C:/Users/gabri/Documents/Larissa/TCC/evaluate-sistem.RData")
 anime=read.csv("animes2.csv")
 rating <-read.csv("rating.csv")
+anime$name = str_replace_all(anime$name,"&#039;","'")  
+anime$name = str_replace_all(anime$name,"&quot;","")
+anime$name = str_replace_all(anime$name,".hack//","") 
+anime$name = str_replace_all(anime$name,"_","")
+anime$name = str_replace_all(anime$name,"&amp;","&")
 
 #data clean
 rating=rating%>%filter(rating!=-1)#remover o grupo de pessoas que assistiram mas nao avaliaram
