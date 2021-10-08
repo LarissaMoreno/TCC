@@ -1,5 +1,6 @@
 require(readr)
 library(dplyr)
+library(stringr)
 library(recommenderlab)
 #setwd("~/Larissa/TCC")
 #save.image("evaluate-sistem.RData")
