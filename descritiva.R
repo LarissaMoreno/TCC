@@ -76,14 +76,15 @@ rating.dist=rating%>%group_by(rating)%>%summarise(Freq=n())
 hist(rating$rating,main="Distribuição das avaliações",xlab="Avaliação",ylab="Frequência",breaks = 10)
 
 
-#Qual anime é mais visto
-anime_views = colCounts(ratingMatrix) # count views for each movie
-table_views = data.frame(anime_id = names(anime_views) , views = anime_views) #create dataframe of views
-table_views = table_views[order(table_views$view , decreasing = TRUE),] #sort by number of views
-table_views$anime_id=as.numeric(table_views$anime_id)
+#Qual anime é mais avaliados
+rating%>%group_by(anime_id)%>%summarise(n=n())%>%arrange(desc(n))%>%
+  inner_join(anime,by="anime_id")%>%select(c(2,3))
 
-table_views=inner_join(table_views,anime,by="anime_id")
-head(table_views[,c(2,3)],10)
+#animes vistos
+rating1=rating <-read.csv("rating.csv")
+rating1$rating[rating1$rating==-1]=1
+rating1=rating1%>%group_by(anime_id)%>%summarise(n=n())
+rating1%>%arrange(desc(n))%>%head(10)%>%inner_join(anime,by="anime_id")%>%select(c(2,3))
 
 
 
