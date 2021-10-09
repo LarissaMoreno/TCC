@@ -97,8 +97,8 @@ plot(density(rating.dist$m),main="Média das avaliações por usuários",xlab="M
 
 #Heatmap (nao normalizado) para os usuarios que mais avaliam e para os top animes
 
-min_n_movies <- quantile(rowCounts(ratingMatrix), 0.9985)#top animes
-min_n_users <- quantile(colCounts(ratingMatrix), 0.99)#top users
+min_n_movies <- quantile(rowCounts(ratingMatrix), 0.998)#top animes
+min_n_users <- quantile(colCounts(ratingMatrix), 0.995)#top users
 min_n_movies
 
 image(ratingMatrix[rowCounts(ratingMatrix) > min_n_movies,
