@@ -21,7 +21,7 @@ rating$user_id <- as.factor(rating$user_id)
 ratingMatrix <- as(rating, "realRatingMatrix")
 
 #e usuarios que avaliaram pelo menos 150 animes
-ratingMatrix = ratingMatrix[rowCounts(ratingMatrix)>=150 , colCounts(ratingMatrix)>=150]
+ratingMatrix = ratingMatrix[rowCounts(ratingMatrix)>=200 , colCounts(ratingMatrix)>=150]
 
 head(rating)
 head(anime[c(1,2,6,7)])
