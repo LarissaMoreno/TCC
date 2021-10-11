@@ -52,7 +52,7 @@ table(anime$cluster)
 #explorando os cluster
 genre1=genre
 genre1$cluster=anime$cluster
-library(plyr)
+library(dplyr)
 t1=genre1%>%group_by(cluster)%>% summarise_each(funs(sum))#somando generos por grupo de cluster
 
 t1=t(t1)
