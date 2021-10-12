@@ -116,7 +116,7 @@ myfunction=function(user.id,n){
   recommend<-recommend[-x1$anime_id]#seleciona apenas os animes "não vistos" pelo usuario
   anime.name=filter(anime,anime_id %in% recommend)%>%select(c(2,6))#pegando os nomes dos ids dos animes
   recommend<-data.frame(anime.name)#criando um df com os nomes dos animes os id
-  recomend<-recommend%>%arrange(desc(rating))#recomendar aqueles com maior rating
+  recommend<-recommend%>%arrange(desc(rating))#recomendar aqueles com maior rating
   colnames(recommend)=c("Nome do Anime","Avaliação Geral")
   suggestions = recommend[1:n,]
   return(suggestions)
