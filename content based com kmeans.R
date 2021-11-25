@@ -2,6 +2,7 @@
 #save.image("content-based.RData")
 #load("C:/Users/gabri/Documents/Larissa/TCC/content-based.RData")
 anime=read.csv("animes2.csv")
+library(stringr)
 anime$name = str_replace_all(anime$name,"&#039;","'")  
 anime$name = str_replace_all(anime$name,"&quot;","")
 anime$name = str_replace_all(anime$name,".hack//","") 
@@ -14,7 +15,6 @@ library(data.table)
 genre=cSplit_e(as.data.table(genre), "genre", ",", type = "character", fill = 0)
 #removendo o genero total
 genre=genre[,-1]
-library(stringr)
 #renomeando as colunas
 colnames(genre)=str_replace(colnames(genre),"genre_","")
 
@@ -73,8 +73,6 @@ wordcloud2(cluster2,size=0.8,shape = "circle")
 wordcloud2(cluster3,size=0.8,shape = "circle")
 
 
-
-
 #Carregando ratinf dataframe
 require(readr)
 rating <-read.csv("rating.csv")
@@ -84,125 +82,58 @@ rating=rating%>%filter(rating!=-1)#remover o grupo de pessoas que assistiram mas
 rating$user_id <- as.factor(rating$user_id)
 
 #Criando uma função que recomenda items para cada usuario
-myfunction=function(user.id,n){
-  #subset rating dataframe pelo id selecionado
-  x=filter(rating,user_id==user.id)%>%mutate(cluster=0)%>%arrange(anime_id)
-  #encontrar o cluster dos animes vistos pelo id selecionado
-  x=left_join(x,anime[,c(1,8)],by="anime_id")%>%select(c(-4))%>%rename(cluster=cluster.y)
-  #filtrar os animes que já viu mesmo nao tendo recomendado
-  x1=filter(rating1,user_id==user.id)%>%mutate(cluster=0)%>%arrange(anime_id)
-  
-  #calcular a avaliação média de cada cluster da lista de animes "avaliados" do id selecionado
-  media.cluster=aggregate(x$rating, by=list(cluster=x$cluster), mean)
-  
-  #se for maior que 7 (devo mudar isso?) entao o usuario gostou dos animes desse cluster 
-  if(max(media.cluster$x)<7){
-    media.cluster<-as.vector(0)
-    #pegue o numero do clustr que tem a avaliação média mais alta
-  } else{
-    media.cluster<-as.vector(t(max(subset(media.cluster, x>=7, select=cluster))))
-  }
-  
-  #subset anime dataframe com apenas as colunas anime_id e cluster
-  df=anime[,c(1,8)]
-  #se a média de avaliação de todos os cluster do usuario for menor que 7
-  #então ele nao gostou de nenhum cluster assim recomende animes aleatorios
-  if(media.cluster==0){
-    recommend<-anime[sample.int(n = dim(anime)[1], size = 100), 1]
-  }else{#caso contrario ele seleciona todos os filmes do cluster com maior média 
-    recommend<-as.vector(t(subset(df, cluster==media.cluster, select=anime_id)))
-  }
-  
-  recommend<-recommend[-x1$anime_id]#seleciona apenas os animes "não vistos" pelo usuario
-  anime.name=filter(anime,anime_id %in% recommend)%>%select(c(2,6))#pegando os nomes dos ids dos animes
-  recommend<-data.frame(anime.name)#criando um df com os nomes dos animes os id
-  recommend<-recommend%>%arrange(desc(rating))#recomendar aqueles com maior rating
-  colnames(recommend)=c("Nome do Anime","Avaliação Geral")
-  suggestions = recommend[1:n,]
-  return(suggestions)
-}
-
-#Criando uma função que recomenda items para cada usuario baseada nos pesos a de cada gosto de genero baseado no global rating
-
-myfunction1=function(user.id,n){
-  #subset rating dataframe pelo id selecionado
+myfunction=function(user.id,n){ #subset rating dataframe pelo id selecionado
   x=filter(rating,user_id==user.id)%>%mutate(cluster=0)%>%arrange(anime_id)
   #encontrar o cluster dos animes vistos pelo id selecionado
   x=left_join(x,anime[,c(1,3,8)],by="anime_id")%>%select(c(-4))%>%rename(cluster=cluster.y)
-  #filtrar os animes que já viu mesmo nao tendo recomendado
-  x1=filter(rating1,user_id==user.id)%>%mutate(cluster=0)%>%arrange(anime_id)
   
-  #calcular a avaliação média de cada cluster da lista de animes "avaliados" do id selecionado
-  media.cluster=aggregate(x$rating, by=list(cluster=x$cluster), mean)
-  
-  #se for maior que 7 (devo mudar isso?) entao o usuario gostou dos animes desse cluster 
-  if(max(media.cluster$x)<7){
-    media.cluster<-as.vector(0)
-    #pegue o numero do clustr que tem a avaliação média mais alta
-  } else{
-    media.cluster<-as.vector(t(max(subset(media.cluster, x>=7, select=cluster))))
-  }
-  
+  #calcular a avaliação medidas de cada cluster da lista de animes "avaliados" do id selecionado
+  medidas=x%>%group_by(cluster)%>%summarise(media=mean(rating),n=n(),sd=sd(rating))
+  medidas=medidas%>%arrange(desc(media),desc(n),sd)
+  cluster.user=medidas[1,1]
+  cluster.user=as.vector(unlist(cluster.user))
   #subset anime dataframe com apenas as colunas anime_id e cluster
   df=anime[,c(1,8)]
-  #se a média de avaliação de todos os cluster do usuario for menor que 7
-  #então ele nao gostou de nenhum cluster assim recomende animes aleatorios
-  if(media.cluster==0){
-    recommend<-anime[sample.int(n = dim(anime)[1], size = 100), 1]
-    recommend<-recommend[-x1$anime_id]#seleciona apenas os animes "não vistos" pelo usuario
-    anime.name=filter(anime,anime_id %in% recommend)%>%select(c(2,6))#pegando os nomes dos ids dos animes
-    recommend<-data.frame(anime.name)#criando um df com os nomes dos animes os id
-    recommend<-recommend%>%arrange(desc(rating))#recomendar aqueles com maior rating
-    colnames(recommend)=c("Nome do Anime","Avaliação Geral")
-    suggestions = recommend[1:n,]
-  }else{#caso contrario ele seleciona todos os filmes do cluster com maior média 
-    recommend<-as.vector(t(subset(df, cluster==media.cluster, select=anime_id)))
-    #subset df usuario alvo com os animes do cluster escolhido
-    df=x%>%filter(cluster==media.cluster)
-    #selecionando o genero e anime_id
-    genre.user=data.frame(anime_id=df$anime_id,genre=df$genre)
-    #tranformando em binario os generos
-    genre.user=cSplit_e(as.data.table(genre.user), "genre", ",", type = "character", fill = 0)
-    #arrumando nomes das colunas
-    colnames(genre.user)=str_replace(colnames(genre.user),"genre_","")
-    #matrix somente com os generos binarios
-    anime.matrix=genre.user[,3:ncol(genre.user)]
-    #vetor com as notas previamnte dadas
-    user.rating=df$rating
-    #calculando os pesos para decidir o profile do usuario
-    weight=anime.matrix*user.rating
-    #pesos de cada genero
-    weight=colSums(weight)
-    #dividindo pela soma
-    weight=weight/sum(weight)
-    
-    #subset dos anime que o usuario ainda não viu
-    recommend=anti_join(anime,x1,by="anime_id")%>%select(c(1,2,3))
-    #transformando em binario os generos
-    recommend.genre=cSplit_e(as.data.table(recommend), "genre", ",", type = "character", fill = 0)
-    #multiplicando pelos pesos
-    recommend.genre=recommend.genre[,4:ncol(recommend.genre)]*weight
-    #df com os nomes dos animes candidatos, junto com o peso de cada anime
-    recommend=data.frame(anime_id=recommend$anime_id,
-                         name=recommend$name,
-                         weight=rowSums(recommend.genre))
-    #ordenando para recomendar os animes com maior peso
-    recommend=recommend%>%arrange(desc(weight))
-    colnames(recommend)=c("ID do Anime","Nome do Anime","Peso")
-    suggestions = recommend[1:n,2:3]
-  }
+  #caso contrario ele seleciona todos os filmes do cluster com maior média 
+  recommend<-as.vector(t(subset(df, cluster==cluster.user, select=anime_id)))
+  #subset df usuario alvo com os animes do cluster escolhido
+  df=x%>%filter(cluster==cluster.user)
+  #selecionando o genero e anime_id
+  genre.user=data.frame(anime_id=df$anime_id,genre=df$genre)
+  #tranformando em binario os generos
+  genre.user=cSplit_e(as.data.table(genre.user), "genre", ",", type = "character", fill = 0)
+  #arrumando nomes das colunas
+  colnames(genre.user)=str_replace(colnames(genre.user),"genre_","")
+  #matrix somente com os generos binarios
+  anime.matrix=genre.user[,3:ncol(genre.user)]
+  #vetor com as notas previamnte dadas
+  user.rating=df$rating
+  #calculando os pesos para decidir o profile do usuario
+  weight=anime.matrix*user.rating
+  #pesos de cada genero
+  weight=colSums(weight)
+  #dividindo pela soma
+  weight=weight/sum(weight)
   
+  #subset dos anime que o usuario ainda não viu
+  recommend=anti_join(anime,x,by="anime_id")%>%filter(cluster==cluster.user)%>%select(c(1,2,3))
+  #transformando em binario os generos
+  recommend.genre=cSplit_e(as.data.table(recommend), "genre", ",", type = "character", fill = 0)
+  colnames(recommend.genre)=str_replace(colnames(recommend.genre),"genre_","")
+  recommend.genre=recommend.genre%>%select(names(weight))
+  #multiplicando pelos pesos
+  recommend.genre=t(t(recommend.genre) *weight)
   
-  return(suggestions)
+  #df com os nomes dos animes candidatos, junto com o peso de cada anime
+  recommend=data.frame(anime_id=recommend$anime_id,
+                       name=recommend$name,
+                       weight=rowSums(recommend.genre))
+  #ordenando para recomendar os animes com maior peso
+  recommend=recommend%>%arrange(desc(weight))
+  colnames(recommend)=c("ID do Anime","Nome do Anime","Peso")
+  suggestions = recommend[1:n,2:3]
+  suggestions  
+  
 }
-
-myfunction(129,10)
-myfunction1(129,10)
-
-system.time({ myfunction(5,10) })
-system.time({ myfunction1(5,10) })
-
-
-
-
-
+user.id=1
+n=10
