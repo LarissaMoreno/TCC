@@ -1,6 +1,3 @@
-#setwd("~/Larissa/TCC")
-#save.image("content-based.RData")
-#load("C:/Users/gabri/Documents/Larissa/TCC/content-based.RData")
 anime=read.csv("animes2.csv")
 library(stringr)
 anime$name = str_replace_all(anime$name,"&#039;","'")  
