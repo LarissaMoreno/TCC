@@ -2,11 +2,8 @@ require(readr)
 library(dplyr)
 library(stringr)
 library(recommenderlab)
-#setwd("~/Larissa/TCC")
-#save.image("evaluate-sistem.RData")
-#load("C:/Users/gabri/Documents/Larissa/TCC/evaluate-sistem.RData")
-anime=read.csv("animes2.csv")
 rating <-read.csv("rating.csv")
+anime=read.csv("animes2.csv")
 anime$name = str_replace_all(anime$name,"&#039;","'")  
 anime$name = str_replace_all(anime$name,"&quot;","")
 anime$name = str_replace_all(anime$name,".hack//","") 
@@ -28,16 +25,14 @@ ratingMatrix = ratingMatrix[rowCounts(ratingMatrix)>=200 , colCounts(ratingMatri
 percentage_training <- 0.8#80% para base de treinammento
 min(rowCounts(ratingMatrix))#número mínimo de itens adquiridos por qualquer usuário 
 
-
+#Para cada usuário no conjunto de teste, precisamos definir quantos itens usar para gerar recomendações
 items_to_keep <- 20#normalmente deve ser menor que o numero minimo de itens por usuario
-rating_threshold <- 7#notas maiores ou iguais a 7 significa que o usuario gostou
-n_eval <- 1#quantas vezes queremos executar a avaliação
 
 
 #cross-validation
 eval_sets <- evaluationScheme(data = ratingMatrix, method = "split",
-                              train = percentage_training, given = items_to_keep, goodRating =
-                                rating_threshold, k = n_eval) 
+                              train = percentage_training, given = items_to_keep, goodRating =5
+                                ) 
 
 
 
@@ -49,8 +44,8 @@ IBCF_prediction <- predict(object = IBCF_model, newdata =
                              getData(eval_sets, "known"), n = 10, type = "ratings")
 
 
-#top 10 recomendações para usuario 129
-x=data.frame(as(IBCF_prediction, 'list')[1])
+#top 10 recomendações para usuario 17
+x=data.frame(as(IBCF_prediction, 'list')[2])
 x$anime_id=as.integer(rownames(x))
 x=arrange(x,desc(x$X129))%>%head(10)
 x=inner_join(x,anime,by="anime_id")%>%select(c(1,3))
@@ -65,17 +60,16 @@ IBCF_accuracy <- calcPredictionAccuracy(
 head(IBCF_accuracy)
 
 
-
 #modelo baseado na filtragem colaborativa por usuario
 UBCF_model <- Recommender(data = getData(eval_sets, "train"), method = "UBCF")
 
 UBCF_prediction <- predict(object = UBCF_model, newdata =
                              getData(eval_sets, "known"), n = 10, type = "ratings")
 
-#top 10 recomendações para usuario 129
+#top 10 recomendações para usuario 17
 x1=data.frame(as(UBCF_prediction, 'list')[1])
 x1$anime_id=as.integer(rownames(x1))
-x1=arrange(x1,desc(x1$X129))%>%head(10)
+x1=arrange(x1,desc(x1$X17))%>%head(10)
 x1=inner_join(x1,anime,by="anime_id")%>%select(c(1,3))
 colnames(x1)=c(paste0("rating de ",colnames(x1)[1]),"name")
 x1
@@ -89,17 +83,16 @@ head(UBCF_accuracy)
 
 
 
-
 #Modelo baseado na popularidade
 POP_model <- Recommender(data = getData(eval_sets, "train"), method = "POPULAR")
 
 POP_prediction <- predict(object = POP_model, newdata =
                              getData(eval_sets, "known"), n = 10, type = "ratings")
 
-#top 10 recomendações para usuario 129
+#top 10 recomendações para usuario 17
 x2=data.frame(as(POP_prediction, 'list')[1])
 x2$anime_id=as.integer(rownames(x2))
-x2=arrange(x2,desc(x2$X129))%>%head(10)
+x2=arrange(x2,desc(x2$X17))%>%head(10)
 x2=inner_join(x2,anime,by="anime_id")%>%select(c(1,3))
 colnames(x2)=c(paste0("rating de ",colnames(x2)[1]),"name")
 x2
@@ -110,6 +103,7 @@ POP_accuracy <- calcPredictionAccuracy(
   x = POP_prediction, data = getData(eval_sets, "unknown"), byUser =
     F)
 head(POP_accuracy)
+
 
 
 ##Comparando recomendações
@@ -125,6 +119,7 @@ models_evaluate <- list(
   UBCF=list(name="UBCF"),
   POPULAR = list(name = "POPULAR"))
 results <- evaluate(x = eval_sets, method =  models_evaluate, n =seq(10, 100, 10))
+#n: numero de recomendação para cada usuaário
 
 
 results[["IBCF"]]@results[[1]]@cm
@@ -134,8 +129,9 @@ results[["POPULAR"]]@results[[1]]@cm
 
 
 #Não sei pra que que serve ainda
-plot(results, annotate = T, legend = "topleft") 
+plot(results, annotate = F, legend = "topleft",xlab="Especificidade", ylab="Sensibilidade") 
 title("ROC Curve")
 
-plot(results, "prec/rec", annotate = T, legend = "bottomright")
-title("Pecision-Recall")
+
+plot(results, "prec/rec", annotate = T, legend = "bottomright",xlab="Sensibilidade",ylab="Precisão")
+title("Pecisão-Sensibilidade")
