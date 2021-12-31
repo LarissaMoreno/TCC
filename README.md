@@ -4,4 +4,4 @@ Sistemas de recomendações são algoritmos que funcionam como filtros que ident
 
 
  
-\textbf{Palavras-chave:} Sistemas de Recomendação; filtragem baseada em conteúdo; filtragem colaborativa; filtragem por popularidade; KNN; K-means.
+**Palavras-chave:** Sistemas de Recomendação; filtragem baseada em conteúdo; filtragem colaborativa; filtragem por popularidade; KNN; K-means.
