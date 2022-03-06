@@ -134,7 +134,7 @@ server <- function(input, output, session) {
     lapply(1:length(teste$uid), function(i) {
       box(width = 3,
           height = 400, 
-          title =h1(paste0(" ", teste[i,2])),
+          title =h1(paste0(" ", teste[i,2])),br(),br(),br(),
           tags$div(img(src = teste[i,11],width = 150, height = 160, align = "center")),
           
           numericInput(paste0("select_",as.numeric(teste[i,1])),
