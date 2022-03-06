@@ -62,6 +62,7 @@ color: white;height: 50px;
   width: 30%;
 }
 
+/*numericinputs*/
 input[type="number"] {
   width: 80px;
   color: white;
