@@ -1,6 +1,9 @@
 library(readr)
 library(recommenderlab)
 library(dplyr)
+library(stringr)
+library(splitstackshape)
+library(data.table)
 
 rating <-read.csv("rating.csv")
 rating=rating%>%filter(rating!=-1)
