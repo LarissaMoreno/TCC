@@ -132,11 +132,6 @@ ui=
   )
 
 
-get_user_ratings <- function(value_list) {
-  dat <- data.table(book_id = sapply(strsplit(names(value_list), "_"), function(x) ifelse(length(x) > 1, x[[2]], NA)),
-                    rating = unlist(as.character(value_list)))
-  
-}
 
 server <- function(input, output, session) {
   output$ui1 <- renderUI({
