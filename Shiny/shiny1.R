@@ -85,6 +85,7 @@ content=function(y){
 }
 ########################################
 teste=v
+teste=teste%>%arrange(title)
 ###################################3
 library(shiny)
 library(shinydashboard)
