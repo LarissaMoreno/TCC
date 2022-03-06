@@ -101,7 +101,7 @@ ui=
                                  
     )),
     
-    dashboardBody(includeCSS("css"),
+    dashboardBody(includeCSS("animes.css"),
                   tabItems(          
                     tabItem(tabName = "animes",
                             fluidRow(
