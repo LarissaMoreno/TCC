@@ -92,8 +92,7 @@ library(shinyjs)
 
 ui=
   dashboardPage(
-    skin = "blue",
-    dashboardHeader(title = "Book Recommender"),
+    dashboardHeader(title = "Animes Recommender"),
     
     dashboardSidebar(sidebarMenu(width =4,
                                  menuItem("Lista de animes",tabName = "animes"),
@@ -101,9 +100,7 @@ ui=
                                  
     )),
     
-    dashboardBody(tags$style(HTML(".box {background: white;margin: auto; margin-top: 5%;
-                                      padding: 20px 50px;box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-                                      transition: all 0.3s cubic-bezier(.25,.8,.25,1);}")),
+    dashboardBody(includeCSS("css"),
                   tabItems(          
                     tabItem(tabName = "animes",
                             fluidRow(
@@ -114,16 +111,16 @@ ui=
                             #table
                             fluidRow(
                               useShinyjs(),
-                              box(
-                                width =10, status = "info", solidHeader = TRUE,
-                                title = "Filtragem Colaborativo, Filtragem Baseado em Conteúdo e Por Popularidade",
+                              box(style=" margin-top: -100px;",
+                                width =10,
+                                title = "",
                                 br(),
                                 actionButton("btn", "Gerar Recomendações", class = "btn-warning")
                               ),
-                              box(width=6,title = "Colaborativa Baseado em Item", tableOutput("table")),
-                              box(width=6,title = "Colaborativa Baseado em Usuário", tableOutput("table1")),
-                              box(width=6,title = "Baseado em Popularidade", tableOutput("table2")),
-                              box(width=6,title = "Baseado em Conteúdo", tableOutput("table3"))
+                              box(width=6,title =h3("Colaborativa Baseado em Item"), tableOutput("table")),
+                              box(width=6,title = h3("Colaborativa Baseado em Usuário"), tableOutput("table1")),
+                              box(width=6,title = h3("Baseado em Popularidade"), tableOutput("table2")),
+                              box(width=6,title = h3("Baseado em Conteúdo"), tableOutput("table3"))
                             )
                             
                             
@@ -131,14 +128,13 @@ ui=
     )
   )
 
-
-
+shinyApp(ui,server)
 server <- function(input, output, session) {
   output$ui1 <- renderUI({
     lapply(1:length(teste$uid), function(i) {
       box(width = 3,
           height = 400, 
-          title =h1(paste0(" ", teste[i,2]),style = 'font-size:12px;color:blue;'),
+          title =h1(paste0(" ", teste[i,2])),
           tags$div(img(src = teste[i,11],width = 150, height = 160, align = "center")),
           
           numericInput(paste0("select_",as.numeric(teste[i,1])),
@@ -177,7 +173,7 @@ server <- function(input, output, session) {
   })
   
 
-   df2 <- eventReactive(input$btn, { 
+  df2 <- eventReactive(input$btn, { 
     value_list <- reactiveValuesToList(input)
     
     value_list=value_list[-c(1,2)]
