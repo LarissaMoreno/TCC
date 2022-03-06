@@ -1,3 +1,4 @@
 - Foi reduzido o número de anime para a criação dos modelo.
 - Os modelos foram criados a partir do pacote recommenderlab
-- A filtragem baseada em conteúdo foi utilizado o métod explicado no video https://www.youtube.com/watch?v=YMZmLx-AUvY&list=LL&index=4
+- A filtragem baseada em conteúdo foi utilizado o métod explicado no video [Content Based Recommender](https://www.youtube.com/watch?v=YMZmLx-AUvY&list=LL&index=4)
+
