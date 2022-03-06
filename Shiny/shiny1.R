@@ -105,7 +105,6 @@ ui=
                     tabItem(tabName = "animes",
                             fluidRow(
                               uiOutput("ui1")
-                              
                             )),
                     tabItem("recomendation",
                             #table
@@ -121,14 +120,11 @@ ui=
                               box(width=6,title = h3("Colaborativa Baseado em Usuário"), tableOutput("table1")),
                               box(width=6,title = h3("Baseado em Popularidade"), tableOutput("table2")),
                               box(width=6,title = h3("Baseado em Conteúdo"), tableOutput("table3"))
-                            )
-                            
-                            
+                            )  
                     ))
     )
   )
 
-shinyApp(ui,server)
 server <- function(input, output, session) {
   output$ui1 <- renderUI({
     lapply(1:length(teste$uid), function(i) {
@@ -139,15 +135,12 @@ server <- function(input, output, session) {
           
           numericInput(paste0("select_",as.numeric(teste[i,1])),
                        label =HTML("<br/> <br/>  Avaliação"),0, min = 0, max = 10))
-      
     })
-    
   })
   
   
   df1 <- eventReactive(input$btn, { 
     value_list <- reactiveValuesToList(input)
-    
     value_list=value_list[-c(1,2)]
     value_list=unlist(value_list)
     dt=data.frame(user_id=factor(1),
@@ -155,41 +148,31 @@ server <- function(input, output, session) {
                   rating=value_list)
     dt$rating=ifelse(dt$rating==0,NA,dt$rating)
     dt=as(as(as(dt,"realRatingMatrix"),"matrix"),"realRatingMatrix")
-    
-    
   })
   output$table=renderTable({
     x=ibcf(df1())
-    
   })
   
   output$table1=renderTable({
-
     x=ubcf(df1())
   })
   output$table2=renderTable({
-
     x=pop(df1())
   })
   
 
   df2 <- eventReactive(input$btn, { 
     value_list <- reactiveValuesToList(input)
-    
     value_list=value_list[-c(1,2)]
     value_list=unlist(value_list)
     dt=data.frame(anime_id=teste[,1],rating=value_list,cluster=v$cluster)
-    
-    
   })
+  
+  
   output$table3=renderTable({
     content(df2()) 
-    
   })
   
 }
 
-
 shinyApp(ui, server)
-
-
