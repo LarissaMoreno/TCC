@@ -182,14 +182,18 @@ server <- function(input, output, session) {
   })
   
 
-  output$table3=renderTable({
+   df2 <- eventReactive(input$btn, { 
     value_list <- reactiveValuesToList(input)
     
     value_list=value_list[-c(1,2)]
     value_list=unlist(value_list)
     dt=data.frame(anime_id=teste[,1],rating=value_list,cluster=v$cluster)
-   content(dt) 
-   
+    
+    
+  })
+  output$table3=renderTable({
+    content(df2()) 
+    
   })
   
 }
