@@ -8,10 +8,10 @@
 
 
 # O que Falta Fazer
-- Escolher a quantidade de animes para os modelo
-- escrever em rds os modelos e a base de dados com os url 
-- mudar o visual com css
+- Escolher a quantidade ideal de animes para os modelo
+  - Se ficar com muitos animes talzes os usuarios não irão querer usar o app
+  - Ver quanto de memória o shiny online suporta
+  
+- escrever em rds os modelos e a base de dados com os url (rds diminui a memoria)
 - mudar a url do shiny
-- encontrar uma forma de usar dois eventReactive para um unico actionbuttom
-- colocar imagem dos animes recomendados?
 - publicar o shiny
