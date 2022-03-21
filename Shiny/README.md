@@ -16,4 +16,5 @@
 - colocar mensagem de error
 - retirar coluna anime id
 - label coluna rating para nota prevista
+- colocar icon nos menuitens
 - publicar o shiny
