@@ -12,6 +12,8 @@
   - Se ficar com muitos animes talzez os usuarios não irão querer usar o app (demora um tempo considerado para avaliar)
   - Ver quanto de memória o shiny online suporta
   
-- escrever em rds os modelos e a base de dados com os url (rds diminui a memoria)
 - mudar a url do shiny
+- colocar mensagem de error
+- retirar coluna anime id
+- label coluna rating para nota prevista
 - publicar o shiny
