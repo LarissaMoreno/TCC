@@ -1,4 +1,5 @@
 
+
 library(readr)
 library(recommenderlab)
 library(dplyr)
@@ -91,74 +92,52 @@ teste=teste%>%arrange(title)
 library(shiny)
 library(shinydashboard)
 library(shinyjs)
-get_replacement_location <-                                   
-  "function myFunction() {
-  // Declare variables
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('myInput');
-  filter = input.value.toUpperCase();
-  ul = document.getElementById('myUL');
-  li = ul.getElementsByTagName('li');
-
-  // Loop through all list items, and hide those who don't match the search query
-  for (i = 0; i < li.length; i++) {
-    a = li[i].getElementsByTagName('a')[0];
-    txtValue = a.textContent || a.innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = '';
-    } else {
-      li[i].style.display = 'none';
-    }
-  }
-}"
 
 
 ui=
-  dashboardPage(
-    dashboardHeader(title = "Animes Recommender"),
-    
-    dashboardSidebar(sidebarMenu(width =4,
-                                 menuItem("Lista de animes",tabName = "animes"),
-                                 menuItem("Recomendações",tabName = "recomendation")
-                                 
-    )),
-    
-    dashboardBody(includeCSS("animes.css"),
-                  tabItems(          
-                    tabItem(tabName = "animes",
-                            fluidRow(
-                              tags$head(tags$script(HTML(
-                                get_replacement_location
-                              ))),
-                              HTML('<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search Anime..">
+    dashboardPage(
+        dashboardHeader(title = "Animes Recommender"),
+        
+        dashboardSidebar(sidebarMenu(width =4,
+                                     menuItem("Lista de animes",tabName = "animes"),
+                                     menuItem("Recomendações",tabName = "recomendation")
+                                     
+        )),
+        
+        dashboardBody(includeCSS("animes.css"),
+                      tabItems(          
+                          tabItem(tabName = "animes",
+                                  fluidRow(
+                                      includeScript("myscript.js"),
+                                      HTML('<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search Anime..">
          '),
-                              tags$ul(id="myUL",style="background-color:#272729; ",lapply(1:length(teste$uid), function(i) {
-                                tags$li(style=" display: inline-block;",
-                                        tags$a(href="#",paste0(" ", teste[i,2]),
-                                               tags$div(img(src = teste[i,11],width = 150, height = 160, align = "center")),
-                                               
-                                               numericInput(paste0("select_",as.numeric(teste[i,1])),
-                                                            label =HTML("<br/> <br/>  Avaliação"),0, min = 0, max = 10)))
-                                
-                              }))
-                              
-                            )),
-                    tabItem("recomendation",
-                            #table
-                            fluidRow(style="overflow-y: hidden;",
-                              useShinyjs(),
-                                  actionButton("btn", "Gerar Recomendações", class = "btn-warning")
-                              ,br(),
-                              box(title =h3("Colaborativa Baseado em Item"), tableOutput("table")),
-                              box(title = h3("Colaborativa Baseado em Usuário"), tableOutput("table1")),
-                              box(title = h3("Baseado em Popularidade"), tableOutput("table2")),
-                              box(title = h3("Baseado em Conteúdo"), tableOutput("table3"))
-                            )
-                            
-                            
-                    ))
+                                      tags$ul(id="myUL",style="background-color:#272729; ",lapply(1:length(teste$uid), function(i) {
+                                          tags$li(style=" display: inline-block;",
+                                                  tags$a(href="#",paste0(" ", teste[i,2]),
+                                                         tags$div(img(src = teste[i,11],width = 150, height = 160, align = "center")),
+                                                         
+                                                         numericInput(paste0("select_",as.numeric(teste[i,1])),
+                                                                      label =HTML("<br/> <br/>  Avaliação"),0, min = 0, max = 10)))
+                                          
+                                      }))
+                                      
+                                  )),
+                          tabItem("recomendation",
+                                  #table
+                                  fluidRow(style="overflow-y: hidden;",
+                                           useShinyjs(),
+                                           actionButton("btn", "Gerar Recomendações", class = "btn-warning")
+                                           ,br(),
+                                           box(title =h3("Colaborativa Baseado em Item"), tableOutput("table")),
+                                           box(title = h3("Colaborativa Baseado em Usuário"), tableOutput("table1")),
+                                           box(title = h3("Baseado em Popularidade"), tableOutput("table2")),
+                                           box(title = h3("Baseado em Conteúdo"), tableOutput("table3"))
+                                  )
+                                  
+                                  
+                          ))
+        )
     )
-  )
 
 
 server <- function(input, output, session) {
@@ -176,20 +155,7 @@ server <- function(input, output, session) {
         
         df=as(as(as(df,"realRatingMatrix"),"matrix"),"realRatingMatrix")
     })
-    
-    output$ui1 <- renderUI({
-        lapply(1:length(teste$uid), function(i) {
-            box(width = 3,
-                height = 400, 
-                title =h1(paste0(" ", teste[i,2])),
-                tags$div(img(src = teste[i,11],width = 150, height = 160, align = "center")),
-                
-                numericInput(paste0("select_",as.numeric(teste[i,1])),
-                             label =HTML("<br/> <br/>  Avaliação"),0, min = 0, max = 10))
-            
-        })
-        
-    })
+
     
     df2= eventReactive(input$btn, { 
         value_list <- reactiveValuesToList(input)
@@ -214,6 +180,9 @@ server <- function(input, output, session) {
     
     output$table=renderTable({
         x=ibcf(df1())
+        validate(
+          need(dim(x)[1] == 0, "No Data to show")
+        )
         
     })
     
