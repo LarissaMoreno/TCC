@@ -12,5 +12,4 @@
   - Se ficar com muitos animes talzez os usuarios não irão querer usar o app (demora um tempo considerado para avaliar)
   - Ver quanto de memória o shiny online suporta
 
-- colocar icon nos menuitens
 - publicar o shiny
