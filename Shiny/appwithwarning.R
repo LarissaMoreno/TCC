@@ -26,18 +26,23 @@ recom=function(x){
     x=arrange(x,desc(x$rating))
     x$item=as.integer(x$item)
     x=inner_join(x,v,by=c("item"="uid"))%>%select(c(2,3,4))%>%head(10)
+    
 }
 
 ibcf=function(x){
     IBCF_prediction <- predict(object = IBCF_model, x, n = 10,type = "ratings")
     x=as(IBCF_prediction, "data.frame")
     x=recom(x)
+    x=x[,-1]
+    colnames(x)=c("Nome","Nota Prevista")
     head(x,10)
 }
 ubcf=function(x){
     UBCF_prediction <- predict(object = UBCF_model, x, n = 10,type = "ratings")
     x=as(UBCF_prediction, "data.frame")
     x=recom(x)
+    x=x[,-1]
+    colnames(x)=c("Nome","Nota Prevista")
     head(x,10)
 }
 
@@ -45,6 +50,8 @@ pop=function(x){
     POP_prediction <- predict(object = POP_model, x, n = 10,type = "ratings")
     x=as(POP_prediction, "data.frame")
     x=recom(x)
+    x=x[,-1]
+    colnames(x)=c("Nome","Nota Prevista")
     head(x,10)
 }
 
@@ -81,7 +88,7 @@ content=function(y){
                          weight=rowSums(recommend.genre))
     
     recommend=recommend%>%arrange(desc(weight))
-    colnames(recommend)=c("ID do Anime","Nome do Anime","Peso")
+    colnames(recommend)=c("ID do Anime","Nome","Nota Prevista")
     suggestions = recommend[1:10,2:3]
     suggestions 
 }
@@ -116,8 +123,8 @@ ui=
         dashboardHeader(title = "Animes Recommender"),
         
         dashboardSidebar(sidebarMenu(width =4,
-                                     menuItem("Lista de animes",tabName = "animes"),
-                                     menuItem("Recomendações",tabName = "recomendation")
+                                     menuItem("Lista de animes",tabName = "animes", icon = icon("list", lib = "glyphicon")),
+                                     menuItem("Recomendações",tabName = "recomendation", icon = icon("film", lib = "glyphicon"))
                                      
         )),
         
@@ -172,7 +179,7 @@ server <- function(input, output, session) {
         
         df=as(as(as(df,"realRatingMatrix"),"matrix"),"realRatingMatrix")
     })
-
+    
     
     df2= eventReactive(input$btn, { 
         value_list <- reactiveValuesToList(input)
@@ -206,44 +213,42 @@ server <- function(input, output, session) {
             )}
         
     })
-
+    
     output$table1=renderUI({
         output$bb <- renderTable(ubcf(df1()))
         x=tableOutput("bb")
         if(input$btn==0){
             
         }else{
-        tryCatch({
-            ubcf(df1())
-            return(x)
-            
-        }, error = function(e) {
-            return(error.message("Colaborativa Baseado em Usuário"))
-            
-        }
-        )}
+            tryCatch({
+                ubcf(df1())
+                return(x)
+                
+            }, error = function(e) {
+                return(error.message("Colaborativa Baseado em Usuário"))
+                
+            }
+            )}
     })
     output$table2=renderUI({
-        output$aa <- renderTable(pop(df1()))
-        if(dim(ibcf(df1()))==0){
-            error.message("Colaborativa Baseado em Popularidade")
-        }else{tableOutput("aa")}
         
+        output$dd <- renderTable(pop(df1()))
+        if(dim(pop(df1()))==0){
+            error.message("Baseado em Popularidade")
+        }else{
+            tableOutput("dd")
+            }
         
     })
-        
+    
     output$table=renderUI({
         output$aa <- renderTable(ibcf(df1()))
         if(dim(ibcf(df1()))==0){
             error.message("Colaborativa Baseado em Item")
         }else{tableOutput("aa")}
         
-
+        
     })
 }
 
 shinyApp(ui,server)
-
-
-
-
