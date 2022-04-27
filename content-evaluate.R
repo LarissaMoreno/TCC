@@ -1,4 +1,19 @@
+equire(readr)
+rating <-read.csv("rating.csv")
+library(dplyr)
+library(recommenderlab)
+rating=rating%>%filter(rating!=-1)#remover o grupo de pessoas que assistiram mas nao avaliaram
+rating$user_id <- as.factor(rating$user_id)
+ratingMatrix <- as(rating, "realRatingMatrix")
+ratingMatrix = ratingMatrix[rowCounts(ratingMatrix)>=50 , colCounts(ratingMatrix)>=100]
+views_per_movie <- colCounts(ratingMatrix)
+views <- as.integer(names(views_per_movie))
+user<- rowCounts(ratingMatrix)
+user.names <- as.integer(names(user))
+
+
 anime=read.csv("animes2.csv")
+anime=anime%>%filter(anime_id %in% views)
 library(stringr)
 anime$name = str_replace_all(anime$name,"&#039;","'")  
 anime$name = str_replace_all(anime$name,"&quot;","")
@@ -19,7 +34,7 @@ colnames(genre)=str_replace(colnames(genre),"genre_","")
 
 ##estimando k
 library(purrr)
-set.seed(30)
+set.seed(15)
 tot_withinss <- map_dbl(1:10,  function(k){
   model <- kmeans(x = genre, centers = k)
   model$tot.withinss
@@ -44,15 +59,10 @@ animecluster= model <- kmeans(x = genre, centers = 3)
 anime$cluster=animecluster$cluster
 
 #Carregando ratinf dataframe
-require(readr)
-rating <-read.csv("rating.csv")
-library(dplyr)
-rating=rating%>%filter(rating!=-1)#remover o grupo de pessoas que assistiram mas nao avaliaram
-rating$user_id <- as.factor(rating$user_id)
 
 
 ####################################################
-
+user.id=user.names[4]
 evaluation1=function(user.id){
   x=filter(rating,user_id==user.id)%>%mutate(cluster=0)%>%arrange(anime_id)
   #encontrar o cluster dos animes vistos pelo id selecionado
@@ -94,15 +104,18 @@ evaluation1=function(user.id){
 }
 
 #coletando apenas os usuários que avaliaram 150 ou mais animes
-teste=rating%>%group_by(user_id)%>%summarise(n=n())%>%filter(n>=150)%>%select(1)
-teste=as.numeric(as.vector.factor(teste$user_id))
+rating=rating%>%filter(user_id %in% user.names, anime_id %in% views)
+
 #aplicando a função a todos os usuarios selecionados
-p=do.call(rbind, lapply(teste, evaluation1))
+p=do.call(rbind, lapply(user.names, evaluation1))
+p1=p%>%group_by(user_id)%>%mutate(yprevisto=predict-mean(predict),
+                                  xprevisto=real.rating-mean(real.rating))
+
 #######################################################################
 #medidas de avaliação de desempenho
-(rmse=sqrt(mean((p$predict-p$real.rating)^2)))
-(mae=mean(abs(p$predict-p$real.rating)))
-(mse=mean((p$predict-p$real.rating)^2))
+(rmse=sqrt(mean((p1$yprevisto-p1$xprevisto)^2)))
+(mae=mean(abs(p1$yprevisto-p1$xprevisto)))
+(mse=mean((p1$yprevisto-p1$xprevisto)^2))
 
 ########################################################################
 
@@ -111,35 +124,30 @@ confusion=function(n){
  df= p %>% arrange(desc(user_id)) %>%  group_by(user_id) %>% slice(1:n)%>% 
    mutate(real.rating=ifelse(real.rating>=5,1,0),predict=ifelse(predict>=5,1,0))
  tabela=table(real=df$real.rating,predict=df$predict)
- TP=tabela[1]
- FP=tabela[2]
- FN=tabela[3]
- TN=tabela[4]
+ TP=tabela[4]
+ FP=tabela[3]
+ FN=tabela[1]
+ TN=tabela[2]
  recall=TP/(TP+FN)
  precision=TP/(TP+FP)
  TPR=TP/(TP+FN)
- FPR=FP/(FP+TN)
+ FPR=FP/(FP+TN) 
  data.frame(TP,FP,FN,TN,precision,recall,TPR,FPR,n)
 }
 
 n=seq(10,100,10)
 #aplicando a funsao da matriz de confusão
 confusion.matrix=do.call(rbind, lapply(n, confusion))
-confusion.matrix
 
 #gráfico de sensibilidade e 1-especificidade
-plot(confusion.matrix$FPR,confusion.matrix$TPR,type="b",xlim=c(0,1),ylim=c(0,1),
+plot(confusion.matrix$FPR,confusion.matrix$TPR,type="b",xlim=c(0,0.2),ylim=c(0,1),
      main="Roc Curve", xlab="FPR",ylab="TPR",col="blue")
 abline(a=0,b=1,lty=2,col="grey")
-legend(x=0.65,y=0.2,legend = "Content-Based",lty = 1, cex=0.8, col = "blue")
+legend(x=0.05,y=1,legend = "Content-Based",lty = 1, cex=0.8, col = "blue")
+
+
 
 #gráfico de precisão-sensibilidade
 plot(confusion.matrix$recall,confusion.matrix$precision,type="b",xlim=c(0,1),ylim=c(0,1),
      main="Precisão-Sensibilidade", xlab="recall",ylab="precision",col="blue")
-legend(x=0.65,y=0.9,legend = "Content-Based",lty = 1, cex=0.8, col = "blue")
-
-
-
- 
- 
- 
+legend(x=0.65,y=0.2,legend = "Content-Based",lty = 1, cex=0.8, col = "blue")
