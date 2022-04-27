@@ -1,5 +1,4 @@
 
-
 library(readr)
 library(recommenderlab)
 library(dplyr)
@@ -41,6 +40,7 @@ ubcf=function(x){
     x=recom(x)
     head(x,10)
 }
+
 pop=function(x){
     POP_prediction <- predict(object = POP_model, x, n = 10,type = "ratings")
     x=as(POP_prediction, "data.frame")
@@ -85,6 +85,23 @@ content=function(y){
     suggestions = recommend[1:10,2:3]
     suggestions 
 }
+error.message=function(title){
+    div(box(title = title,
+            div(img(src='https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/sign-error-icon.png',
+                    width = "35%"),style="position: relative;left: 110px;bottom: -30px;"),
+            
+            div("ERROR!",style=" font-size: 140%; font-weight: bold;position: relative;bottom: -100px;
+              left: 120px;"),
+            
+            
+            div("-Avaliações do Usuário possui desvio padrão igual à 0",br(),
+                "-Usuário ainda não avaliou",br(),
+                "-Usuário avaliou apenas 1 item",
+                style="position: relative;bottom: -120px;  font-size: 120%; ")
+            
+    ),style="position: relative;bottom: 125px;
+              left: -75px;")
+}
 ########################################
 teste=v
 teste=teste%>%arrange(title)
@@ -128,10 +145,10 @@ ui=
                                            useShinyjs(),
                                            actionButton("btn", "Gerar Recomendações", class = "btn-warning")
                                            ,br(),
-                                           box(title =h3("Colaborativa Baseado em Item"), tableOutput("table")),
-                                           box(title = h3("Colaborativa Baseado em Usuário"), tableOutput("table1")),
-                                           box(title = h3("Baseado em Popularidade"), tableOutput("table2")),
-                                           box(title = h3("Baseado em Conteúdo"), tableOutput("table3"))
+                                           box(title =h3("Colaborativa Baseado em Item"),  uiOutput("table")),
+                                           box(title = h3("Colaborativa Baseado em Usuário"), uiOutput("table1")),
+                                           box(title = h3("Baseado em Popularidade"), uiOutput("table2")),
+                                           box(title = h3("Baseado em Conteúdo"), uiOutput("table3"))
                                   )
                                   
                                   
@@ -172,29 +189,61 @@ server <- function(input, output, session) {
         
     })
     
-    output$table3=renderTable({
-        class(df2()$anime_id)
-        df2()
-        content(df2())
-    })
-    
-    output$table=renderTable({
-        x=ibcf(df1())
-        validate(
-          need(dim(x)[1] == 0, "No Data to show")
-        )
+    output$table3=renderUI({
+        output$cc <- renderTable(content(df2()))
+        x=tableOutput("cc")
+        if(input$btn==0){
+            
+        }else{
+            tryCatch({
+                content(df2())
+                return(x)
+                
+            }, error = function(e) {
+                return(error.message("Colaborativa Baseado em Usuário"))
+                
+            }
+            )}
         
     })
-    
-    output$table1=renderTable({
-        
-        x=ubcf(df1())
+
+    output$table1=renderUI({
+        output$bb <- renderTable(ubcf(df1()))
+        x=tableOutput("bb")
+        if(input$btn==0){
+            
+        }else{
+        tryCatch({
+            ubcf(df1())
+            return(x)
+            
+        }, error = function(e) {
+            return(error.message("Colaborativa Baseado em Usuário"))
+            
+        }
+        )}
     })
-    output$table2=renderTable({
+    output$table2=renderUI({
+        output$dd <- renderTable(pop(df1()))
+        if(dim(ibcf(df1()))==0){
+            error.message("Colaborativa Baseado em Popularidade")
+        }else{tableOutput("dd")}
         
-        x=pop(df1())
+        
     })
-    
+        
+    output$table=renderUI({
+        output$aa <- renderTable(ibcf(df1()))
+        if(dim(ibcf(df1()))==0){
+            error.message("Colaborativa Baseado em Item")
+        }else{tableOutput("aa")}
+        
+
+    })
 }
 
 shinyApp(ui,server)
+
+
+
+
