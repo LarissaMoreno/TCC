@@ -1,3 +1,16 @@
+require(readr)
+rating <-read.csv("rating.csv")
+library(dplyr)
+library(recommenderlab)
+rating=rating%>%filter(rating!=-1)#remover o grupo de pessoas que assistiram mas nao avaliaram
+rating$user_id <- as.factor(rating$user_id)
+ratingMatrix <- as(rating, "realRatingMatrix")
+ratingMatrix = ratingMatrix[rowCounts(ratingMatrix)>=50 , colCounts(ratingMatrix)>=100]
+views_per_movie <- colCounts(ratingMatrix)
+views <- as.integer(names(views_per_movie))
+user<- rowCounts(ratingMatrix)
+user.names <- as.integer(names(user))
+
 anime=read.csv("animes2.csv")
 library(stringr)
 anime$name = str_replace_all(anime$name,"&#039;","'")  
@@ -133,4 +146,5 @@ myfunction=function(user.id,n){ #subset rating dataframe pelo id selecionado
   
 }
 user.id=1
-n=10
+n=5
+myfunction(user.id,5)
